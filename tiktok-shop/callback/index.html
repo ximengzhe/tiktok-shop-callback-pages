@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>TikTok Shop 授权回调</title>
+    <style>
+      :root { color-scheme: light; font-family: system-ui, -apple-system, sans-serif; }
+      body { margin: 12vh auto; max-width: 680px; padding: 24px; color: #18222d; line-height: 1.7; }
+      main { border: 1px solid #dce3e8; border-radius: 12px; padding: 24px; }
+      h1 { font-size: 1.35rem; }
+      .ok { color: #087443; }
+      .error { color: #a21b1b; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1 id="title">正在检查授权回调…</h1>
+      <p id="message">请稍候。</p>
+      <p id="next"></p>
+    </main>
+    <script>
+      (() => {
+        const params = new URLSearchParams(location.search);
+        const title = document.querySelector('#title');
+        const message = document.querySelector('#message');
+        const next = document.querySelector('#next');
+        const hasCode = params.has('code') && params.get('code');
+        const hasState = params.has('state') && params.get('state');
+        const failed = params.has('error');
+        if (failed || !hasCode || !hasState) {
+          title.textContent = '授权未完成';
+          title.className = 'error';
+          message.textContent = '回调地址缺少有效的授权参数，请返回上架助手重新发起授权。';
+          return;
+        }
+        title.textContent = '授权回调已收到';
+        title.className = 'ok';
+        message.textContent = 'TikTok Shop 已返回本次授权参数。';
+        next.textContent = '请复制浏览器地址栏中的完整回调地址，粘贴到“上架助手”的授权页面。';
+      })();
+    </script>
+  </body>
+</html>
