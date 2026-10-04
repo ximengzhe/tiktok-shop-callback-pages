@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="referrer" content="no-referrer" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'" />
+    <title>TikTok Shop 授权回调 · 新应用</title>
+    <style>
+      :root { color-scheme: light; font-family: system-ui, -apple-system, sans-serif; }
+      body { max-width: 680px; margin: 10vh auto; padding: 24px; color: #18222d; line-height: 1.8; background: #f6f8fa; }
+      main { padding: 28px; border: 1px solid #dce3e8; border-radius: 14px; background: white; }
+      h1 { margin-top: 0; font-size: 1.4rem; }
+      .ok { color: #087443; }
+      .error { color: #a21b1b; }
+      .note { color: #596876; font-size: .9rem; }
+      button { padding: 10px 18px; border: 0; border-radius: 6px; color: white; background: #087443; font: inherit; cursor: pointer; }
+      button:focus-visible { outline: 3px solid #66bca1; outline-offset: 3px; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1 id="title">回调页已就绪</h1>
+      <p id="message">这是新应用的 TikTok Shop 授权回调入口。请从“上架助手”发起店铺授权。</p>
+      <p id="next">仅打开本页不会完成店铺授权。</p>
+      <button id="copy" type="button" hidden>复制完整回调地址</button>
+      <p id="feedback" role="status" aria-live="polite"></p>
+      <p class="note">收到授权参数后，仍需回到本地程序验证并连接店铺。本页不会交换或保存店铺令牌。</p>
+    </main>
+    <script>
+      (() => {
+        const params = new URLSearchParams(location.search);
+        const title = document.querySelector('#title');
+        const message = document.querySelector('#message');
+        const next = document.querySelector('#next');
+        const copy = document.querySelector('#copy');
+        const feedback = document.querySelector('#feedback');
+        if (!params.has('code') && !params.has('state') && !params.has('error')) return;
+        const complete = ['code', 'state'].every(key => params.getAll(key).length === 1 && params.get(key).trim());
+        if (params.has('error') || !complete) {
+          title.textContent = '授权未完成';
+          title.className = 'error';
+          message.textContent = '本次回调缺少有效参数，或官方授权未完成。';
+          next.textContent = '请回到“上架助手”，重新点击“授权新店铺”。';
+          return;
+        }
+        title.textContent = '授权回调已收到';
+        title.className = 'ok';
+        message.textContent = '请复制完整回调地址，粘贴到“上架助手”的设置页面。';
+        next.textContent = '然后点击“验证授权并连接店铺”，完成后可在店铺管理中查看。';
+        copy.hidden = false;
+        copy.addEventListener('click', async () => {
+          try {
+            await navigator.clipboard.writeText(location.href);
+            feedback.textContent = '已复制，请回到上架助手完成验证。';
+          } catch {
+            feedback.textContent = '浏览器未允许自动复制，请手动复制地址栏中的完整网址。';
+          }
+        });
+      })();
+    </script>
+  </body>
+</html>
